@@ -1,47 +1,53 @@
 # Backstage development portal
 
-Тестовое Backstage-приложение с локальными PostgreSQL и GitLab. Исходники
-frontend и backend находятся в корне репозитория в `packages/`, а инфраструктура
-для разработки описана в `compose.yaml`.
+A sample Backstage application with local PostgreSQL and GitLab instances. The
+frontend and backend source code is located in `packages/` at the repository
+root, while the development infrastructure is defined in `compose.yaml`.
 
-## Что входит
+## What's included
 
-- Backstage frontend и backend с гостевой авторизацией для локальной разработки;
-- PostgreSQL как хранилище Backstage и внешний PostgreSQL для GitLab;
-- GitLab Community Edition на `http://localhost:8080`;
-- GitLab catalog provider, который раз в 30 минут ищет `catalog-info.yaml`;
-- software template **Node.js service in GitLab**, создающий приватный проект и
-  сразу регистрирующий его в каталоге.
+- A Backstage frontend and backend with guest authentication for local
+  development;
+- PostgreSQL as the Backstage data store and a separate PostgreSQL instance for
+  GitLab;
+- GitLab Community Edition at `http://localhost:8080`;
+- A GitLab catalog provider that searches for `catalog-info.yaml` every 30
+  minutes;
+- The **Node.js service in GitLab** software template, which creates a private
+  project and immediately registers it in the catalog.
 
-## Требования
+## Requirements
 
-- Node.js 22 или 24;
-- Docker с Compose v2;
-- не менее 6 GB свободной оперативной памяти для GitLab.
+- Node.js 22 or 24;
+- Docker with Compose v2;
+- At least 6 GB of available memory for GitLab.
 
-## Первый запуск
+## First run
 
-1. Создайте локальный файл окружения:
+1. Create the local environment file:
 
    ```bash
    cp .env.example .env
    ```
 
-2. Запустите инфраструктуру. Первый старт GitLab обычно занимает несколько минут:
+2. Start the infrastructure. GitLab usually takes several minutes to start for
+   the first time:
 
    ```bash
    docker compose up -d
    docker compose ps
    ```
 
-3. Создайте idempotent personal access token для Backstage. Скрипт дождётся
-   статуса `healthy` и установит GitLab root-пользователю токен со scope `api`:
+3. Create an idempotent personal access token for Backstage. The script waits
+   until GitLab reports a `healthy` status and creates a token with the `api`
+   scope for the GitLab root user:
 
    ```bash
    ./scripts/bootstrap-gitlab.sh
    ```
 
-4. Экспортируйте переменные, установите зависимости и запустите Backstage:
+4. Export the environment variables, install the dependencies, and start
+   Backstage:
 
    ```bash
    set -a
@@ -51,39 +57,40 @@ frontend и backend находятся в корне репозитория в `
    yarn start
    ```
 
-5. Откройте Backstage по адресу `http://localhost:3000` и войдите как guest.
-   GitLab доступен по `http://localhost:8080` (логин `root`, пароль из
-   `GITLAB_ROOT_PASSWORD`).
+5. Open Backstage at `http://localhost:3000` and sign in as a guest. GitLab is
+   available at `http://localhost:8080` (username: `root`; password: the value
+   of `GITLAB_ROOT_PASSWORD`).
 
-## Создание проекта кнопкой
+## Creating a project from the UI
 
-1. В Backstage откройте **Create**.
-2. Выберите **Node.js service in GitLab** и нажмите **Choose**.
-3. Заполните название и описание.
-4. В Repository Location укажите owner `root` и имя нового репозитория.
-5. Нажмите **Create**. Backstage отрендерит заготовку, создаст приватный GitLab
-   проект и зарегистрирует его `catalog-info.yaml` в каталоге.
+1. Open **Create** in Backstage.
+2. Select **Node.js service in GitLab**, then click **Choose**.
+3. Enter a name and description.
+4. Under Repository Location, set the owner to `root` and enter the name of the
+   new repository.
+5. Click **Create**. Backstage renders the template, creates a private GitLab
+   project, and registers its `catalog-info.yaml` in the catalog.
 
-Публикация выполняется серверным `GITLAB_TOKEN`; пользователю не нужно передавать
-собственный токен в форме.
+Publishing uses the server-side `GITLAB_TOKEN`; users do not need to provide
+their own token in the form.
 
-## Полезные команды
+## Useful commands
 
 ```bash
-# Логи GitLab
+# Follow GitLab logs
 docker compose logs -f gitlab
 
-# Проверки приложения
+# Check the application
 yarn tsc
 yarn lint:all
 yarn test
 
-# Остановить сервисы
+# Stop the services
 docker compose down
 
-# Полностью удалить dev-данные
+# Delete all development data
 docker compose down -v
 ```
 
-Данные PostgreSQL и GitLab сохраняются в именованных Docker volumes. SQL-файл
-инициализации выполняется только при первом создании volume `postgres-data`.
+PostgreSQL and GitLab data is persisted in named Docker volumes. The SQL
+initialization file runs only when the `postgres-data` volume is first created.
