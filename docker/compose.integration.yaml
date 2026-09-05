@@ -1,0 +1,39 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - postgres-test-data:/var/lib/postgresql/data
+      - ./postgres/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U postgres']
+      interval: 1s
+      timeout: 5s
+      retries: 30
+
+  postgres-test:
+    image: postgres:16-alpine
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      PGPASSWORD: postgres
+    command:
+      - /bin/sh
+      - -ec
+      - |
+        result="$$(psql -h postgres -U postgres -d postgres -Atc \
+          "SELECT datname || ':' || pg_catalog.pg_get_userbyid(datdba) FROM pg_database WHERE datname IN ('backstage', 'gitlabhq_production') ORDER BY datname")"
+        expected="$$(printf 'backstage:backstage\ngitlabhq_production:gitlab')"
+        test "$$result" = "$$expected" || {
+          printf 'Unexpected databases or owners:\n%s\n' "$$result" >&2
+          exit 1
+        }
+
+        psql -h postgres -U backstage -d backstage -Atc 'SELECT 1' | grep -qx 1
+        PGPASSWORD=gitlab psql -h postgres -U gitlab -d gitlabhq_production -Atc 'SELECT 1' | grep -qx 1
+
+volumes:
+  postgres-test-data:

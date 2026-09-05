@@ -78,6 +78,9 @@ yarn tsc
 yarn lint:all
 yarn test
 
+# Интеграционный тест инициализации PostgreSQL в изолированных контейнерах
+yarn test:integration
+
 # Остановить сервисы
 docker compose down
 
