@@ -1,6 +1,7 @@
 {
   "name": "project",
-  "dockerComposeFile": "../docker-compose.yml",
+  "dockerComposeFile": "../compose.yaml",
   "service": "dev",
-  "workspaceFolder": "/workspace"
+  "workspaceFolder": "/workspace",
+  "initializeCommand": "echo preparing dev environment"
 }
