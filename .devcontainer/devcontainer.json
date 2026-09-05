@@ -3,5 +3,6 @@
   "dockerComposeFile": "../compose.yaml",
   "service": "dev",
   "workspaceFolder": "/workspace",
-  "initializeCommand": "echo preparing dev environment"
+  "initializeCommand": "echo preparing dev environment",
+  "shutdownAction": "stopCompose"
 }
