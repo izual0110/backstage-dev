@@ -1,0 +1,74 @@
+apiVersion: scaffolder.backstage.io/v1beta3
+kind: Template
+metadata:
+  name: gitlab-nodejs-service
+  title: Node.js service in GitLab
+  description: Creates a Node.js service repository in the local GitLab and registers it in the catalog
+spec:
+  owner: user:default/guest
+  type: service
+  parameters:
+    - title: Service information
+      required: [name, description]
+      properties:
+        name:
+          title: Name
+          type: string
+          description: Unique component and repository name
+          ui:field: EntityNamePicker
+          ui:autofocus: true
+        description:
+          title: Description
+          type: string
+          default: Node.js service created by Backstage
+        owner:
+          title: Owner
+          type: string
+          default: user:default/guest
+          ui:field: OwnerPicker
+          ui:options:
+            catalogFilter:
+              kind: User
+    - title: GitLab repository
+      required: [repoUrl]
+      properties:
+        repoUrl:
+          title: Repository location
+          type: string
+          ui:field: RepoUrlPicker
+          ui:options:
+            allowedHosts: [localhost:8080]
+  steps:
+    - id: fetch
+      name: Render service skeleton
+      action: fetch:template
+      input:
+        url: ./content
+        values:
+          name: ${{ parameters.name }}
+          description: ${{ parameters.description }}
+          owner: ${{ parameters.owner }}
+
+    - id: publish
+      name: Create GitLab project
+      action: publish:gitlab
+      input:
+        repoUrl: ${{ parameters.repoUrl }}
+        description: ${{ parameters.description }}
+        defaultBranch: main
+        repoVisibility: private
+
+    - id: register
+      name: Register in the catalog
+      action: catalog:register
+      input:
+        repoContentsUrl: ${{ steps.publish.output.repoContentsUrl }}
+        catalogInfoPath: /catalog-info.yaml
+
+  output:
+    links:
+      - title: GitLab repository
+        url: ${{ steps.publish.output.remoteUrl }}
+      - title: Open in catalog
+        icon: catalog
+        entityRef: ${{ steps.register.output.entityRef }}
