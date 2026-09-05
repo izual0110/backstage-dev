@@ -1,4 +1,10 @@
 services:
+  dev:
+      image: ubuntu:24.04
+      command: sleep infinity
+      working_dir: /workspace
+      volumes:
+        - .:/workspace
   postgres:
     image: postgres:16-alpine
     environment:
