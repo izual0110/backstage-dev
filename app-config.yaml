@@ -139,7 +139,7 @@ backend:
 
 integrations:
   gitlab:
-    - host: localhost:8080
+    - host: gitlab:8080
       apiBaseUrl: http://gitlab:8080/api/v4
       baseUrl: http://gitlab:8080
       token: ${GITLAB_TOKEN}
