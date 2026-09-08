@@ -37,6 +37,7 @@ services:
       GITLAB_ROOT_PASSWORD: ${GITLAB_ROOT_PASSWORD:-backstage-dev-password}
       GITLAB_OMNIBUS_CONFIG: |
         external_url 'http://localhost:8080'
+        puma['port'] = 8081
         gitlab_rails['gitlab_shell_ssh_port'] = 2222
         postgresql['enable'] = false
         gitlab_rails['db_adapter'] = 'postgresql'
