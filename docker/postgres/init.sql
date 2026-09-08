@@ -1,4 +1,4 @@
-CREATE USER backstage WITH PASSWORD 'backstage';
+CREATE USER backstage WITH PASSWORD 'backstage' CREATEDB;
 CREATE DATABASE backstage OWNER backstage;
 
 CREATE USER gitlab WITH PASSWORD 'gitlab';

@@ -1,10 +1,16 @@
 services:
   dev:
-      image: ubuntu:24.04
-      command: sleep infinity
-      working_dir: /workspace
-      volumes:
-        - .:/workspace
+    build:
+      context: .devcontainer
+      dockerfile: Dockerfile
+    image: backstage-dev:local
+    working_dir: /workspace
+    volumes:
+      - .:/workspace
+      - /var/run/docker.sock:/var/run/docker.sock
+    ports:
+      - '3000:3000'
+      - '7007:7007'
   postgres:
     image: postgres:16-alpine
     environment:
