@@ -54,9 +54,10 @@ spec:
       action: publish:gitlab
       input:
         repoUrl: ${{ parameters.repoUrl }}
-        description: ${{ parameters.description }}
         defaultBranch: main
-        repoVisibility: private
+        settings:
+          description: ${{ parameters.description }}
+          visibility: private
 
     - id: register
       name: Register in the catalog
